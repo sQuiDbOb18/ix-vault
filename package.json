@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "hash-password": "node scripts/hash-password.mjs",
     "lint": "next lint"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "react-hook-form": "^7.59.0",
     "swr": "^2.3.3",
     "tailwind-merge": "^2.6.0",
+    "tsconfig.json": "^1.0.11",
     "typescript": "^5.8.3",
     "zod": "^3.25.67"
   },
