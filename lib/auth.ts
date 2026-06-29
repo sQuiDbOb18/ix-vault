@@ -1,41 +1,48 @@
-import bcrypt from "bcryptjs";
-import type { NextAuthOptions } from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60
-  },
-  pages: {
-    signIn: "/login"
-  },
   providers: [
     CredentialsProvider({
-      name: "IX VAULT Credentials",
+      name: "credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        const username = process.env.ADMIN_USERNAME;
-        const passwordHash = process.env.ADMIN_PASSWORD_HASH;
-        if (!username || !passwordHash || !credentials?.username || !credentials.password) return null;
-        const userMatches = credentials.username.trim() === username;
-        const passwordMatches = await bcrypt.compare(credentials.password, passwordHash);
-        if (!userMatches || !passwordMatches) return null;
-        return { id: "ix-vault-admin", name: username };
+        if (!credentials?.username || !credentials?.password) return null;
+
+        const adminUsername = process.env.ADMIN_USERNAME;
+        const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+
+        if (!adminUsername || !adminPasswordHash) {
+          console.error("AUTH ERROR: missing ADMIN_USERNAME or ADMIN_PASSWORD_HASH");
+          return null;
+        }
+
+        const usernameMatch = credentials.username.toLowerCase() === adminUsername.toLowerCase();
+        const passwordMatch = await bcrypt.compare(credentials.password, adminPasswordHash);
+
+        if (!usernameMatch || !passwordMatch) return null;
+
+        return { id: "1", name: adminUsername, email: "admin@ixvault.local" };
       }
     })
   ],
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: { signIn: "/login" },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.name = user.name;
+      if (user) token.id = user.id;
       return token;
     },
     async session({ session, token }) {
-      if (session.user) session.user.name = token.name;
+      if (token && session.user) session.user.name = token.name as string;
       return session;
     }
   }
 };
+
+export default NextAuth(authOptions);
