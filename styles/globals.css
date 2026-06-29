@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-void: #060810;
+  --bg-base: #090c18;
+  --bg-surface: #0d1020;
+  --bg-elevated: #111526;
+  --bg-overlay: #161b30;
+  --bg-input: #0a0d1c;
+  --border-ghost: rgba(91, 110, 245, 0.06);
+  --border-subtle: rgba(91, 110, 245, 0.12);
+  --border-default: rgba(91, 110, 245, 0.20);
+  --border-active: rgba(91, 110, 245, 0.40);
+  --border-bright: rgba(91, 110, 245, 0.65);
+  --accent-cobalt: #5b6ef5;
+  --accent-cobalt-dim: #3d4fb8;
+  --accent-cobalt-glow: rgba(91, 110, 245, 0.18);
+  --accent-cobalt-soft: rgba(91, 110, 245, 0.10);
+  --accent-violet: #7c5cf5;
+  --accent-gold: #c9a84c;
+  --accent-gold-soft: rgba(201, 168, 76, 0.12);
+  --text-primary: #dde2f5;
+  --text-secondary: #7a85a8;
+  --text-muted: #3e4869;
+  --text-accent: #8394f8;
+  --status-paid: #1ed8a0;
+  --status-paid-bg: rgba(30, 216, 160, 0.09);
+  --status-paid-border: rgba(30, 216, 160, 0.22);
+  --status-pending: #e8a027;
+  --status-pending-bg: rgba(232, 160, 39, 0.09);
+  --status-pending-border: rgba(232, 160, 39, 0.22);
+  --status-overdue: #f03e5a;
+  --status-overdue-bg: rgba(240, 62, 90, 0.09);
+  --status-overdue-border: rgba(240, 62, 90, 0.22);
+  --shadow-card: 0 0 0 1px var(--border-subtle), 0 1px 0 0 rgba(255,255,255,0.04) inset, 0 -1px 0 0 rgba(0,0,0,0.3) inset, 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-void);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(91, 110, 245, 0.12), transparent 30%),
+    linear-gradient(180deg, var(--bg-base), var(--bg-void));
+  color: var(--text-primary);
+  font-family: var(--font-inter), Inter, sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-space), "Space Grotesk", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 2px solid var(--border-bright);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent-cobalt);
+  color: white;
+}
+
+.premium-card {
+  background: var(--bg-surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.hover-lift {
+  transition: transform 0.18s cubic-bezier(0.4,0,0.2,1), box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card), 0 0 24px var(--accent-cobalt-glow);
+}
+
+.amount {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-ref {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  opacity: 0.75;
+}
+
+.wordmark {
+  font-family: var(--font-space), "Space Grotesk", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes lightboxIn {
+  from { transform: scale(0.90); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes toastIn {
+  from { transform: translate(12px, -8px); opacity: 0; }
+  to { transform: translate(0, 0); opacity: 1; }
+}
+
+@keyframes toastOut {
+  to { transform: translateX(16px); opacity: 0; }
+}
+
+@keyframes rowIn {
+  from { transform: translateY(4px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+@keyframes activeGrow {
+  from { clip-path: inset(50% 0 50% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes flashValue {
+  0%, 100% { color: inherit; }
+  35% { color: var(--accent-cobalt); }
+}
+
+.drawer-in {
+  animation: slideInRight 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+
+.lightbox-in {
+  animation: lightboxIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-overlay) 50%, var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.toast-enter {
+  animation: toastIn 0.2s ease-out;
+}
+
+.toast-exit {
+  animation: toastOut 0.18s ease-in forwards;
+}
+
+.row-enter {
+  animation: rowIn 0.24s ease-out both;
+}
+
+.shake {
+  animation: shake 0.42s ease-in-out;
+}
+
+.value-flash {
+  animation: flashValue 0.4s ease-out;
+}
+
+.active-indicator {
+  animation: activeGrow 0.24s ease-out;
+}
