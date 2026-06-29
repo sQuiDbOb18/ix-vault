@@ -36,8 +36,8 @@ export function DashboardView() {
   const params = useSearchParams();
   const filters = useMemo(() => readFilters(params), [params]);
   const { openAddPayment } = useDashboardActions();
-  const { members } = useMembers();
-  const { payments, isLoading, deletePayment } = usePayments(filters);
+  const { members, error: membersError } = useMembers();
+  const { payments, isLoading, error: paymentsError, deletePayment } = usePayments(filters);
   const stats = useStats(payments, members);
   const { toast } = useToast();
   const [editing, setEditing] = useState<Payment | null>(null);
@@ -64,6 +64,11 @@ export function DashboardView() {
 
   return (
     <div className="space-y-6">
+      {(membersError || paymentsError) && (
+        <div className="premium-card border border-[var(--status-overdue-border)] bg-[var(--status-overdue-bg)] p-4 text-sm text-[var(--status-overdue)]">
+          {paymentsError instanceof Error ? paymentsError.message : membersError instanceof Error ? membersError.message : "Dashboard data could not be loaded."}
+        </div>
+      )}
       <StatsRow stats={stats} />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <section className="space-y-4">

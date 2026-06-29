@@ -7,7 +7,10 @@ import type { PaymentInput, PaymentUpdateInput } from "@/lib/validations";
 
 async function fetcher(url: string) {
   const response = await fetch(url);
-  if (!response.ok) throw new Error("Unable to load payments");
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? "Unable to load payments");
+  }
   return (await response.json()) as PaymentsResponse;
 }
 

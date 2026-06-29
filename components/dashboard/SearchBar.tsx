@@ -11,7 +11,9 @@ export function SearchBar({ value, onChange }: { value: string; onChange: (value
   const ref = useRef<HTMLInputElement>(null);
   useKeyboard({ "/": () => ref.current?.focus() });
 
-  useEffect(() => onChange(debounced), [debounced, onChange]);
+  useEffect(() => {
+    if (debounced !== value) onChange(debounced);
+  }, [debounced, onChange, value]);
   useEffect(() => setLocal(value), [value]);
 
   return (
