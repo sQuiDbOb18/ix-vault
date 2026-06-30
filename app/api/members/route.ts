@@ -33,7 +33,14 @@ export async function POST(request: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const parsed = memberSchema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid member" }, { status: 400 });
-  const { data, error } = await getServiceSupabase().from("members").insert(parsed.data).select("*").single();
+  const supabase = getServiceSupabase();
+  const normalizedName = parsed.data.name.trim().toLowerCase();
+  const existing = await supabase.from("members").select("*");
+  if (existing.error) return NextResponse.json({ error: existing.error.message }, { status: 500 });
+  const duplicate = ((existing.data ?? []) as Member[]).find((member) => member.name.trim().toLowerCase() === normalizedName);
+  if (duplicate) return NextResponse.json(duplicate);
+
+  const { data, error } = await supabase.from("members").insert(parsed.data).select("*").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data as Member, { status: 201 });
 }

@@ -52,10 +52,25 @@ create trigger payments_updated_at
 
 create or replace function upsert_member_on_payment()
 returns trigger as $$
+declare
+  normalized_name text;
+  existing_member_id uuid;
+  existing_member_name text;
 begin
-  insert into members (name) values (new.member_name)
-  on conflict (name) do nothing;
-  select id into new.member_id from members where name = new.member_name;
+  normalized_name := btrim(new.member_name);
+  select id, name into existing_member_id, existing_member_name
+  from members
+  where lower(btrim(name)) = lower(normalized_name)
+  limit 1;
+
+  if existing_member_id is null then
+    insert into members (name)
+    values (normalized_name)
+    returning id, name into existing_member_id, existing_member_name;
+  end if;
+
+  new.member_id := existing_member_id;
+  new.member_name := existing_member_name;
   return new;
 end;
 $$ language plpgsql;
@@ -94,6 +109,7 @@ create index if not exists payments_status_idx on payments(status);
 create index if not exists payments_member_name_idx on payments(member_name);
 create index if not exists payments_date_idx on payments(payment_date desc);
 create index if not exists activity_log_created_idx on activity_log(created_at desc);
+create unique index if not exists members_name_normalized_unique on members (lower(btrim(name)));
 
 insert into storage.buckets (id, name, public)
 values ('receipts', 'receipts', true)

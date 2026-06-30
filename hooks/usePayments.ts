@@ -1,6 +1,6 @@
 "use client";
 
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import type { Payment, PaymentFilters, PaymentsResponse } from "@/types";
 import { toSearchString } from "@/lib/utils";
 import type { PaymentInput, PaymentUpdateInput } from "@/lib/validations";
@@ -15,6 +15,7 @@ async function fetcher(url: string) {
 }
 
 export function usePayments(filters: PaymentFilters = {}) {
+  const { mutate } = useSWRConfig();
   const search = toSearchString(filters as Record<string, string | number | undefined>);
   const key = search ? `/api/payments?${search}` : "/api/payments";
   const swr = useSWR<PaymentsResponse>(key, fetcher, { keepPreviousData: true });
@@ -44,6 +45,7 @@ export function usePayments(filters: PaymentFilters = {}) {
       },
       { optimisticData: (current) => (current ? { ...current, data: [optimistic, ...current.data], total: current.total + 1 } : { data: [optimistic], total: 1, page: 1, totalPages: 1 }), rollbackOnError: true, revalidate: true }
     );
+    await mutate((cacheKey) => typeof cacheKey === "string" && (cacheKey === "/api/members" || cacheKey.startsWith("/api/payments")), undefined, { revalidate: true });
   };
 
   const updatePayment = async (id: string, input: PaymentUpdateInput) => {

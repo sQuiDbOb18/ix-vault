@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { PlusCircle } from "lucide-react";
 import type { Member, Payment } from "@/types";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { formatDate, formatNaira } from "@/lib/utils";
 
-export function MemberCard({ member, payments }: { member: Member; payments: Payment[] }) {
+export function MemberCard({ member, payments, onAddPayment }: { member: Member; payments: Payment[]; onAddPayment: (member: Member) => void }) {
   const [expanded, setExpanded] = useState(false);
   const roleColor = member.role === "Commander" ? "var(--accent-gold)" : member.role === "Officer" ? "var(--accent-cobalt)" : "var(--border-default)";
   const history = payments.filter((payment) => payment.member_name === member.name);
@@ -23,6 +25,19 @@ export function MemberCard({ member, payments }: { member: Member; payments: Pay
         <div><p className="text-text-secondary">Pending</p><p className="amount text-[var(--status-pending)]">{formatNaira(member.total_pending ?? 0)}</p></div>
         <div><p className="text-text-secondary">Payments</p><p className="amount">{member.payment_count ?? 0}</p></div>
         <div><p className="text-text-secondary">Last payment</p><p>{formatDate(member.last_payment_date)}</p></div>
+      </div>
+      <div className="mt-4 border-t border-[var(--border-ghost)] pt-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-center"
+          onClick={(event) => {
+            event.stopPropagation();
+            onAddPayment(member);
+          }}
+        >
+          <PlusCircle size={16} />
+          Add Payment
+        </Button>
       </div>
       {expanded && (
         <div className="mt-4 space-y-2 border-t border-[var(--border-ghost)] pt-4">

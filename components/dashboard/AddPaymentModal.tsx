@@ -18,18 +18,21 @@ async function uploadReceipt(file: File) {
   return (await response.json()) as { receipt_url: string; receipt_path: string };
 }
 
-export function AddPaymentModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function AddPaymentModal({ open, onClose, prefilledMemberName }: { open: boolean; onClose: () => void; prefilledMemberName?: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [memberNameLocked, setMemberNameLocked] = useState(Boolean(prefilledMemberName));
   const { createPayment } = usePayments();
   const { members } = useMembers();
   const { toast } = useToast();
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const defaultStatus: PaymentInput["status"] = prefilledMemberName ? "Pending" : "Paid";
+  const defaultPaymentDate = prefilledMemberName ? "" : today;
   const form = useForm<PaymentInput>({
     resolver: zodResolver(paymentSchema),
     mode: "onBlur",
     reValidateMode: "onChange",
-    defaultValues: { member_name: "", amount: undefined as unknown as number, payment_date: today, status: "Paid", payment_method: "Transfer", due_date: "", transaction_ref: "", notes: "", receipt_url: "", receipt_path: "" }
+    defaultValues: { member_name: prefilledMemberName ?? "", amount: undefined as unknown as number, payment_date: defaultPaymentDate, status: defaultStatus, payment_method: "Transfer", due_date: "", transaction_ref: "", notes: "", receipt_url: "", receipt_path: "" }
   });
   const { handleSubmit, reset, formState: { isSubmitting } } = form;
 
@@ -37,9 +40,10 @@ export function AddPaymentModal({ open, onClose }: { open: boolean; onClose: () 
     if (open) {
       setError(null);
       setFile(null);
-      reset({ member_name: "", amount: undefined as unknown as number, payment_date: today, status: "Paid", payment_method: "Transfer", due_date: "", transaction_ref: "", notes: "", receipt_url: "", receipt_path: "" });
+      setMemberNameLocked(Boolean(prefilledMemberName));
+      reset({ member_name: prefilledMemberName ?? "", amount: undefined as unknown as number, payment_date: defaultPaymentDate, status: defaultStatus, payment_method: "Transfer", due_date: "", transaction_ref: "", notes: "", receipt_url: "", receipt_path: "" });
     }
-  }, [open, reset, today]);
+  }, [defaultPaymentDate, defaultStatus, open, prefilledMemberName, reset]);
 
   const onFile = (selected?: File) => {
     if (!selected) return;
@@ -72,10 +76,12 @@ export function AddPaymentModal({ open, onClose }: { open: boolean; onClose: () 
       <PaymentModalForm
         form={form}
         members={members}
+        memberNameLocked={memberNameLocked}
         file={file}
         uploadError={error}
         isSubmitting={isSubmitting}
         submitLabel="Save Payment"
+        onUnlockMemberName={() => setMemberNameLocked(false)}
         onFile={onFile}
         onRemoveFile={() => setFile(null)}
         onCancel={onClose}
