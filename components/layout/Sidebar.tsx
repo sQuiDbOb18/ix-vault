@@ -40,7 +40,7 @@ export function SidebarContent() {
 
 export function Sidebar() {
   return (
-    <aside className="sidebar-shell fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-[var(--border-ghost)] bg-[var(--bg-void)] p-5 lg:flex">
+    <aside className="sidebar-shell fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-[var(--border-ghost)] bg-[var(--bg-void)] p-5 lg:flex">
       <SidebarContent />
     </aside>
   );

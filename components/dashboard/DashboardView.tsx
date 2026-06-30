@@ -45,7 +45,8 @@ export function DashboardView() {
   const [receipt, setReceipt] = useState<Payment | null>(null);
 
   const patchFilters = useCallback((patch: PaymentFilters) => {
-    router.push(`/dashboard?${toSearchString({ ...filters, ...patch, page: 1 } as Record<string, string | number | undefined>)}`);
+    const search = toSearchString({ ...filters, ...patch, page: 1 } as Record<string, string | number | undefined>);
+    router.push(search ? `/dashboard?${search}` : "/dashboard");
   }, [filters, router]);
 
   const sort = (sortBy: NonNullable<PaymentFilters["sortBy"]>) => {

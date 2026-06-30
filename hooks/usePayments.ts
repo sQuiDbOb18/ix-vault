@@ -15,7 +15,8 @@ async function fetcher(url: string) {
 }
 
 export function usePayments(filters: PaymentFilters = {}) {
-  const key = `/api/payments?${toSearchString(filters as Record<string, string | number | undefined>)}`;
+  const search = toSearchString(filters as Record<string, string | number | undefined>);
+  const key = search ? `/api/payments?${search}` : "/api/payments";
   const swr = useSWR<PaymentsResponse>(key, fetcher, { keepPreviousData: true });
 
   const createPayment = async (input: PaymentInput) => {
@@ -46,6 +47,7 @@ export function usePayments(filters: PaymentFilters = {}) {
   };
 
   const updatePayment = async (id: string, input: PaymentUpdateInput) => {
+    if (!id) throw new Error("Payment id is required");
     await swr.mutate(
       async (current) => {
         const response = await fetch(`/api/payments/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
@@ -58,6 +60,7 @@ export function usePayments(filters: PaymentFilters = {}) {
   };
 
   const deletePayment = async (payment: Payment) => {
+    if (!payment.id) throw new Error("Payment id is required");
     await swr.mutate(
       async (current) => {
         const response = await fetch(`/api/payments/${payment.id}`, { method: "DELETE" });

@@ -38,7 +38,10 @@ export default function HistoryPage() {
   const [editing, setEditing] = useState<Payment | null>(null);
   const [deleting, setDeleting] = useState<Payment | null>(null);
   const [receipt, setReceipt] = useState<Payment | null>(null);
-  const patch = useCallback((patchFilters: PaymentFilters) => router.push(`/dashboard/history?${toSearchString({ ...filters, ...patchFilters } as Record<string, string | number | undefined>)}`), [filters, router]);
+  const patch = useCallback((patchFilters: PaymentFilters) => {
+    const search = toSearchString({ ...filters, ...patchFilters } as Record<string, string | number | undefined>);
+    router.push(search ? `/dashboard/history?${search}` : "/dashboard/history");
+  }, [filters, router]);
   const total = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   const exportCsv = () => {

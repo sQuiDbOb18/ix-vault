@@ -386,6 +386,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 }
 
 .stat-card-icon {
+  pointer-events: none;
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
@@ -420,6 +421,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   left: 0;
   top: 8px;
   z-index: 1;
+  pointer-events: none;
   width: 2px;
   height: 32px;
   border-radius: 999px;
