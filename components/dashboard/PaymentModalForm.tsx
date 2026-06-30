@@ -115,7 +115,7 @@ function AmountField({ form }: { form: UseFormReturn<PaymentInput> }) {
               type="text"
               inputMode="decimal"
               value={
-                field.value === undefined || field.value === null || field.value === ""
+                field.value === undefined || field.value === null
                   ? ""
                   : Number(field.value).toLocaleString("en-NG")
               }
