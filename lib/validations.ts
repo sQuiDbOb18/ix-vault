@@ -4,7 +4,7 @@ const dateString = z.string().refine((value) => !Number.isNaN(Date.parse(value))
 
 export const paymentSchema = z.object({
   member_name: z.string().trim().min(2, "Member name is required"),
-  amount: z.coerce.number().positive("Amount must be positive").max(10000000, "Amount is too large"),
+  amount: z.coerce.number().positive("Amount must be greater than 0").max(10000000, "Amount too large"),
   payment_date: dateString.refine((value) => {
     const input = new Date(`${value}T00:00:00`);
     const today = new Date();
@@ -14,10 +14,10 @@ export const paymentSchema = z.object({
   due_date: z.string().optional().nullable(),
   status: z.enum(["Paid", "Pending", "Overdue"]),
   payment_method: z.enum(["Transfer", "Cash", "Other"]),
-  transaction_ref: z.string().trim().max(50, "Reference is too long").optional().nullable(),
-  notes: z.string().trim().max(1000, "Notes are too long").optional().nullable(),
-  receipt_url: z.string().url().optional().nullable(),
-  receipt_path: z.string().optional().nullable()
+  transaction_ref: z.string().trim().max(50, "Reference is too long").optional().or(z.literal("")),
+  notes: z.string().trim().max(500, "Notes are too long").optional().or(z.literal("")),
+  receipt_url: z.string().optional(),
+  receipt_path: z.string().optional()
 });
 
 export const paymentUpdateSchema = paymentSchema.partial().refine((value) => Object.keys(value).length > 0, "No updates supplied");
