@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   if (!file.type.startsWith("image/") && file.type !== "application/pdf") return NextResponse.json({ error: "Receipt must be an image or PDF" }, { status: 400 });
 
   const ext = file.name.includes(".") ? file.name.split(".").pop() : file.type.split("/").pop();
-  const receiptPath = `${crypto.randomUUID()}-${Date.now()}.${ext}`;
+  const receiptPath = `uploads/${crypto.randomUUID()}-${Date.now()}.${ext}`;
   const supabase = getServiceSupabase();
   const upload = await supabase.storage.from("receipts").upload(receiptPath, file, { contentType: file.type, upsert: false });
   if (upload.error) return NextResponse.json({ error: upload.error.message }, { status: 500 });
