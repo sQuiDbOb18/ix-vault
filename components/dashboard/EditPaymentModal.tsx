@@ -25,7 +25,7 @@ export function EditPaymentModal({ payment, open, onClose }: { payment: Payment 
   const { toast } = useToast();
   const form = useForm<PaymentInput>({
     resolver: zodResolver(paymentSchema),
-    mode: "onTouched",
+    mode: "onBlur",
     reValidateMode: "onChange"
   });
   const { handleSubmit, reset, formState: { isSubmitting } } = form;

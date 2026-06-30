@@ -3,8 +3,10 @@ import { z } from "zod";
 const dateString = z.string().refine((value) => !Number.isNaN(Date.parse(value)), "Use a valid date");
 
 export const paymentSchema = z.object({
-  member_name: z.string().trim().min(2, "Member name is required"),
-  amount: z.coerce.number().positive("Amount must be greater than 0").max(10000000, "Amount too large"),
+  member_name: z.string().trim().min(1, "Member name is required"),
+  amount: z.coerce.number({ invalid_type_error: "Enter a valid amount" })
+    .positive("Amount must be greater than 0")
+    .max(10000000, "Amount too large"),
   payment_date: dateString.refine((value) => {
     const input = new Date(`${value}T00:00:00`);
     const today = new Date();

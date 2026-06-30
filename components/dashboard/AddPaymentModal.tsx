@@ -27,7 +27,7 @@ export function AddPaymentModal({ open, onClose }: { open: boolean; onClose: () 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const form = useForm<PaymentInput>({
     resolver: zodResolver(paymentSchema),
-    mode: "onTouched",
+    mode: "onBlur",
     reValidateMode: "onChange",
     defaultValues: { member_name: "", amount: undefined as unknown as number, payment_date: today, status: "Paid", payment_method: "Transfer", due_date: "", transaction_ref: "", notes: "", receipt_url: "", receipt_path: "" }
   });

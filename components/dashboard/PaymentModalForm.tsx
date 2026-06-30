@@ -17,11 +17,6 @@ const statusStyles: Record<PaymentStatus, string> = {
   Overdue: "border-[var(--status-overdue-border)] bg-[var(--status-overdue-bg)] text-[var(--status-overdue)]"
 };
 
-function formatAmount(value: unknown) {
-  if (value === undefined || value === null || value === "" || Number.isNaN(value)) return "";
-  return Number(value).toLocaleString("en-NG");
-}
-
 function fileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -79,43 +74,68 @@ function TextField({
   );
 }
 
-function AmountField({ form }: { form: UseFormReturn<PaymentInput> }) {
-  const error = shouldShowError(form, "amount") ? form.formState.errors.amount?.message : undefined;
+function MemberNameField({ form, members }: { form: UseFormReturn<PaymentInput>; members: Member[] }) {
   return (
     <Controller
       control={form.control}
+      name="member_name"
+      render={({ field, fieldState }) => (
+        <label className="modal-field-group block">
+          <Label>Member Name</Label>
+          <input
+            {...field}
+            list="member-names"
+            autoComplete="off"
+            className={inputClass(Boolean(fieldState.error))}
+          />
+          <datalist id="member-names">{members.map((member) => <option key={member.id} value={member.name} />)}</datalist>
+          <FieldError message={fieldState.error?.message} />
+        </label>
+      )}
+    />
+  );
+}
+
+function AmountField({ form }: { form: UseFormReturn<PaymentInput> }) {
+  return (
+    <Controller
       name="amount"
-      render={({ field }) => (
+      control={form.control}
+      render={({ field, fieldState }) => (
         <label className="modal-field-group block">
           <Label>Amount</Label>
           <div
             className={cn(
               "flex min-h-12 overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-input)] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] transition focus-within:border-[var(--border-active)] focus-within:shadow-[0_0_0_3px_var(--accent-cobalt-soft)]",
-              error && "border-[var(--status-overdue-border)] shadow-[0_0_0_3px_rgba(240,62,90,0.08)]"
+              fieldState.error && "border-[var(--status-overdue-border)] shadow-[0_0_0_3px_rgba(240,62,90,0.08)]"
             )}
           >
             <span className="flex w-12 items-center justify-center border-r border-[var(--border-subtle)] font-mono text-lg font-medium text-[var(--accent-cobalt)]">₦</span>
             <input
               type="text"
               inputMode="decimal"
-              value={formatAmount(field.value)}
-              onBlur={field.onBlur}
+              value={
+                field.value === undefined || field.value === null || field.value === ""
+                  ? ""
+                  : Number(field.value).toLocaleString("en-NG")
+              }
               onChange={(event) => {
-                const raw = event.target.value.replace(/,/g, "");
-                const nextValue = Number(raw);
+                const raw = event.target.value.replace(/,/g, "").trim();
                 if (raw === "") {
                   field.onChange(undefined);
                   return;
                 }
-                if (/^\d*\.?\d*$/.test(raw) && Number.isFinite(nextValue)) {
-                  field.onChange(nextValue);
+                if (/^\d*\.?\d*$/.test(raw)) {
+                  const nextValue = Number(raw);
+                  if (Number.isFinite(nextValue)) field.onChange(nextValue);
                 }
               }}
+              onBlur={field.onBlur}
               placeholder="0"
               className="h-12 min-w-0 flex-1 bg-transparent px-3 font-mono text-2xl text-text-primary outline-none placeholder:text-text-muted"
             />
           </div>
-          <FieldError message={error} />
+          <FieldError message={fieldState.error?.message} />
         </label>
       )}
     />
@@ -287,8 +307,7 @@ export function PaymentModalForm({
       <section className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]">
         <h3 className="mb-4 font-display text-sm font-semibold text-text-primary">Payment Details</h3>
         <div className="space-y-4">
-          <TextField formApi={form} name="member_name" label="Member Name" list="member-names" autoComplete="off" />
-          <datalist id="member-names">{members.map((member) => <option key={member.id} value={member.name} />)}</datalist>
+          <MemberNameField form={form} members={members} />
           <div className="grid gap-4 min-[480px]:grid-cols-2">
             <AmountField form={form} />
             <StatusControl form={form} />
