@@ -1,22 +1,31 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { BarChart3, History, LogOut, Users } from "lucide-react";
 import { NavItem } from "@/components/layout/NavItem";
 import { Button } from "@/components/ui/Button";
 
+const navItems = [
+  { href: "/dashboard", icon: BarChart3, label: "Dashboard" },
+  { href: "/dashboard/members", icon: Users, label: "Members" },
+  { href: "/dashboard/history", icon: History, label: "History" }
+];
+
 export function SidebarContent() {
   const { data } = useSession();
+  const pathname = usePathname();
+  const activeIndex = Math.max(0, navItems.findIndex((item) => item.href === pathname));
+
   return (
     <>
       <div className="mb-10">
-        <div className="wordmark text-2xl"><span className="text-[var(--accent-cobalt)]">IX</span> VAULT</div>
+        <div className="wordmark text-2xl"><span className="text-gradient-cobalt">IX</span> VAULT</div>
         <div className="mt-1 font-mono text-[10px] tracking-[0.12em] text-text-muted">9₮H_LEGION</div>
       </div>
-      <nav className="space-y-2">
-        <NavItem href="/dashboard" icon={BarChart3} label="Dashboard" />
-        <NavItem href="/dashboard/members" icon={Users} label="Members" />
-        <NavItem href="/dashboard/history" icon={History} label="History" />
+      <nav className="relative space-y-2">
+        <span className="nav-active-indicator" style={{ transform: `translateY(${activeIndex * 52}px)` }} />
+        {navItems.map((item) => <NavItem key={item.href} {...item} active={pathname === item.href} />)}
       </nav>
       <div className="mt-auto rounded-md border border-[var(--border-ghost)] bg-[var(--bg-surface)] p-3">
         <p className="text-xs text-text-muted">Logged in as</p>
@@ -31,7 +40,7 @@ export function SidebarContent() {
 
 export function Sidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-[var(--border-ghost)] bg-[var(--bg-void)] p-5 lg:flex">
+    <aside className="sidebar-shell fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-[var(--border-ghost)] bg-[var(--bg-void)] p-5 lg:flex">
       <SidebarContent />
     </aside>
   );

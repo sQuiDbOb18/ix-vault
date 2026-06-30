@@ -19,7 +19,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <DashboardContext.Provider value={value}>
       <Sidebar />
       <MobileSidebar open={navOpen} onClose={() => setNavOpen(false)} />
-      <div className="min-h-screen lg:pl-64">
+      <div className="dashboard-bg min-h-screen lg:pl-64">
         <Header onMenu={() => setNavOpen(true)} onAdd={() => setAddOpen(true)} />
         <main className="px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>

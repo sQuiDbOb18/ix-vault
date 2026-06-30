@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
+import { AlertCircle, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ToastType = "success" | "error" | "info";
@@ -10,8 +10,17 @@ type ToastItem = ToastInput & { id: string; closing: boolean };
 
 const ToastContext = createContext<{ toast: (input: ToastInput) => void } | null>(null);
 
+function SuccessIcon() {
+  return (
+    <svg className="toast-check" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <circle cx="9" cy="9" r="8" fill="none" stroke="currentColor" strokeWidth="1.6" opacity="0.35" />
+      <path d="M5 9.2 7.7 12 13 6.4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
 const styles: Record<ToastType, { border: string; icon: React.ReactNode }> = {
-  success: { border: "border-l-[var(--status-paid)]", icon: <CheckCircle2 size={18} /> },
+  success: { border: "border-l-[var(--status-paid)]", icon: <SuccessIcon /> },
   error: { border: "border-l-[var(--status-overdue)]", icon: <AlertCircle size={18} /> },
   info: { border: "border-l-[var(--accent-cobalt)]", icon: <Info size={18} /> }
 };

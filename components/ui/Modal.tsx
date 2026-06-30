@@ -26,7 +26,7 @@ export function Modal({
   useFocusTrap(ref, open, onClose);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 bg-[rgba(6,8,16,0.72)] backdrop-blur-md" onMouseDown={onClose}>
+    <div className="modal-backdrop fixed inset-0 z-50 bg-[rgba(6,8,16,0.72)] backdrop-blur-md" onMouseDown={onClose}>
       <div
         ref={ref}
         role="dialog"

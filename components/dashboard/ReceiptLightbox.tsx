@@ -48,13 +48,13 @@ export function ReceiptLightbox({ payment, payments, onClose, onNavigate }: { pa
         </div>
         <div className="flex flex-1 items-center justify-center">
           {isPdf ? (
-            <div className="lightbox-in premium-card flex max-w-sm flex-col items-center p-8 text-center">
+            <div className="lightbox-in lightbox-develop premium-card flex max-w-sm flex-col items-center p-8 text-center">
               <FileText size={54} className="mb-4 text-text-accent" />
               <h3 className="mb-2 text-xl">PDF Receipt</h3>
               <Button onClick={() => window.open(payment.receipt_url ?? "", "_blank")}><ExternalLink size={16} /> Open PDF</Button>
             </div>
           ) : (
-            <img className="lightbox-in max-h-[82vh] max-w-[88vw] border border-[rgba(255,255,255,0.08)] object-contain shadow-[0_32px_80px_rgba(0,0,0,0.8)]" src={payment.receipt_url} alt={`Receipt for ${payment.member_name}`} />
+            <img className="lightbox-in lightbox-develop max-h-[82vh] max-w-[88vw] border border-[rgba(255,255,255,0.08)] object-contain shadow-[0_32px_80px_rgba(0,0,0,0.8)]" src={payment.receipt_url} alt={`Receipt for ${payment.member_name}`} />
           )}
         </div>
       </div>

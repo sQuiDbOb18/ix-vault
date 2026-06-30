@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
-import { AlertCircle, CloudUpload, FileImage, FileText, Loader2, X } from "lucide-react";
+import { AlertCircle, CloudUpload, FileImage, FileText, X } from "lucide-react";
 import { Controller, type FieldPath, type UseFormReturn } from "react-hook-form";
 import type { Member, PaymentMethod, PaymentStatus } from "@/types";
 import { cn } from "@/lib/utils";
@@ -19,16 +19,7 @@ const statusStyles: Record<PaymentStatus, string> = {
 
 function formatAmount(value: unknown) {
   if (value === undefined || value === null || value === "" || Number.isNaN(value)) return "";
-  const [whole, decimal] = String(value).replace(/,/g, "").split(".");
-  const formattedWhole = whole ? Number(whole).toLocaleString("en-NG") : "";
-  return decimal !== undefined ? `${formattedWhole}.${decimal.slice(0, 2)}` : formattedWhole;
-}
-
-function parseAmount(value: string) {
-  const cleaned = value.replace(/,/g, "").replace(/[^\d.]/g, "");
-  const [whole = "", ...rest] = cleaned.split(".");
-  const normalized = rest.length ? `${whole}.${rest.join("")}` : whole;
-  return normalized === "" ? undefined : Number(normalized);
+  return Number(value).toLocaleString("en-NG");
 }
 
 function fileSize(bytes: number) {
@@ -80,7 +71,7 @@ function TextField({
 }) {
   const error = shouldShowError(formApi, name) ? formApi.formState.errors[name]?.message?.toString() : undefined;
   return (
-    <label className="block">
+    <label className="modal-field-group block">
       <Label optional={optional}>{label}</Label>
       <input className={cn(inputClass(Boolean(error)), className)} {...formApi.register(name)} {...props} />
       <FieldError message={error} />
@@ -95,7 +86,7 @@ function AmountField({ form }: { form: UseFormReturn<PaymentInput> }) {
       control={form.control}
       name="amount"
       render={({ field }) => (
-        <label className="block">
+        <label className="modal-field-group block">
           <Label>Amount</Label>
           <div
             className={cn(
@@ -105,10 +96,21 @@ function AmountField({ form }: { form: UseFormReturn<PaymentInput> }) {
           >
             <span className="flex w-12 items-center justify-center border-r border-[var(--border-subtle)] font-mono text-lg font-medium text-[var(--accent-cobalt)]">₦</span>
             <input
+              type="text"
               inputMode="decimal"
               value={formatAmount(field.value)}
               onBlur={field.onBlur}
-              onChange={(event) => field.onChange(parseAmount(event.target.value))}
+              onChange={(event) => {
+                const raw = event.target.value.replace(/,/g, "");
+                const nextValue = Number(raw);
+                if (raw === "") {
+                  field.onChange(undefined);
+                  return;
+                }
+                if (/^\d*\.?\d*$/.test(raw) && Number.isFinite(nextValue)) {
+                  field.onChange(nextValue);
+                }
+              }}
               placeholder="0"
               className="h-12 min-w-0 flex-1 bg-transparent px-3 font-mono text-2xl text-text-primary outline-none placeholder:text-text-muted"
             />
@@ -127,7 +129,7 @@ function StatusControl({ form }: { form: UseFormReturn<PaymentInput> }) {
       control={form.control}
       name="status"
       render={({ field }) => (
-        <div>
+        <div className="modal-field-group">
           <Label>Status</Label>
           <div className="grid grid-cols-3 gap-2">
             {statusOptions.map((status) => {
@@ -160,7 +162,7 @@ function MethodControl({ form }: { form: UseFormReturn<PaymentInput> }) {
       control={form.control}
       name="payment_method"
       render={({ field }) => (
-        <div>
+        <div className="modal-field-group">
           <Label>Payment Method</Label>
           <div className="grid grid-cols-3 gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-input)] p-1">
             {methodOptions.map((method) => (
@@ -303,7 +305,7 @@ export function PaymentModalForm({
         <div className="space-y-4">
           <MethodControl form={form} />
           <TextField formApi={form} name="transaction_ref" label="Transaction Reference" optional placeholder="e.g. TRX-2026-0042" className="font-mono" />
-          <label className="block">
+          <label className="modal-field-group block">
             <Label optional>Notes</Label>
             <textarea
               rows={3}
@@ -319,7 +321,7 @@ export function PaymentModalForm({
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className="modal-field-group space-y-3">
         <Label optional>Receipt</Label>
         <ReceiptUpload file={file} currentReceiptUrl={currentReceiptUrl} onFile={onFile} onRemove={onRemoveFile} />
       </section>
@@ -338,10 +340,9 @@ export function PaymentModalForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[var(--accent-cobalt)] px-5 text-sm font-semibold text-white shadow-[0_0_0_rgba(91,110,245,0)] transition hover:bg-[var(--accent-cobalt-dim)] hover:shadow-[0_0_22px_var(--accent-cobalt-glow)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="primary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-          {isSubmitting ? "Saving..." : submitLabel}
+          {isSubmitting ? <><span className="dot-loader" aria-hidden="true"><span /><span /><span /></span><span>Saving...</span></> : submitLabel}
         </button>
       </footer>
     </form>

@@ -1,13 +1,35 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { Edit3, Image, Trash2 } from "lucide-react";
 import type { Payment } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { formatDate, formatNaira, truncate } from "@/lib/utils";
+import { cn, formatDate, formatNaira, truncate } from "@/lib/utils";
 
-export function PaymentRow({ payment, index, onEdit, onReceipt, onDelete }: { payment: Payment; index: number; onEdit: (payment: Payment) => void; onReceipt: (payment: Payment) => void; onDelete: (payment: Payment) => void }) {
+export function PaymentRow({ payment, index, revealOnScroll = false, onEdit, onReceipt, onDelete }: { payment: Payment; index: number; revealOnScroll?: boolean; onEdit: (payment: Payment) => void; onReceipt: (payment: Payment) => void; onDelete: (payment: Payment) => void }) {
+  const ref = useRef<HTMLTableRowElement>(null);
+  const [visible, setVisible] = useState(!revealOnScroll);
+
+  useEffect(() => {
+    if (!revealOnScroll || !ref.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) {
+        setVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.12 });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [revealOnScroll]);
+
   return (
-    <tr className="row-enter border-t border-[var(--border-ghost)] transition hover:bg-[var(--bg-elevated)]" style={{ animationDelay: `${index * 40}ms` }}>
+    <tr
+      ref={ref}
+      className={cn("payment-row border-t border-[var(--border-ghost)] transition hover:bg-[var(--bg-elevated)]", revealOnScroll ? "history-reveal-row" : "row-enter", visible && "is-visible")}
+      style={{ animationDelay: `${Math.min(index * 40, 480)}ms` }}
+    >
       <td className="px-4 py-4 text-sm text-text-muted">{index + 1}</td>
       <td className="px-4 py-4 font-medium">{payment.member_name}</td>
       <td className="amount px-4 py-4 text-right">{formatNaira(payment.amount)}</td>
