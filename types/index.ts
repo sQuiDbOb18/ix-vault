@@ -52,6 +52,7 @@ export interface DashboardStats {
   paymentCount: number;
   collectionRate: number;
   thisMonthCollected: number;
+  collectionTrend: number[];
 }
 
 export interface PaymentFilters {

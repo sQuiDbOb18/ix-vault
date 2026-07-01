@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDownUp } from "lucide-react";
-import type { Payment, PaymentFilters } from "@/types";
+import type { Member, Payment, PaymentFilters } from "@/types";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { MobilePaymentCard } from "@/components/dashboard/MobilePaymentCard";
 import { PaymentRow } from "@/components/dashboard/PaymentRow";
@@ -18,7 +18,7 @@ const headers: Array<{ key?: PaymentFilters["sortBy"]; label: string; align?: st
   { label: "Actions", align: "text-right" }
 ];
 
-export function PaymentTable({ payments, isLoading, filters, onSort, onAdd, onEdit, onReceipt, onDelete, revealOnScroll = false }: { payments: Payment[]; isLoading: boolean; filters: PaymentFilters; onSort: (sortBy: NonNullable<PaymentFilters["sortBy"]>) => void; onAdd: () => void; onEdit: (payment: Payment) => void; onReceipt: (payment: Payment) => void; onDelete: (payment: Payment) => void; revealOnScroll?: boolean }) {
+export function PaymentTable({ payments, members, isLoading, filters, onSort, onAdd, onEdit, onReceipt, onDelete, revealOnScroll = false }: { payments: Payment[]; members: Member[]; isLoading: boolean; filters: PaymentFilters; onSort: (sortBy: NonNullable<PaymentFilters["sortBy"]>) => void; onAdd: () => void; onEdit: (payment: Payment) => void; onReceipt: (payment: Payment) => void; onDelete: (payment: Payment) => void; revealOnScroll?: boolean }) {
   if (!isLoading && payments.length === 0) return <EmptyState onAdd={onAdd} />;
   return (
     <>
@@ -38,7 +38,7 @@ export function PaymentTable({ payments, isLoading, filters, onSort, onAdd, onEd
             </tr>
           </thead>
           <tbody>
-            {isLoading ? Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />) : payments.map((payment, index) => <PaymentRow key={payment.id} payment={payment} index={index} revealOnScroll={revealOnScroll} onEdit={onEdit} onReceipt={onReceipt} onDelete={onDelete} />)}
+            {isLoading ? Array.from({ length: 6 }).map((_, index) => <SkeletonRow key={index} />) : payments.map((payment, index) => <PaymentRow key={payment.id} payment={payment} members={members} index={index} revealOnScroll={revealOnScroll} onEdit={onEdit} onReceipt={onReceipt} onDelete={onDelete} />)}
           </tbody>
         </table>
       </div>

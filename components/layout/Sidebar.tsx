@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BarChart3, History, LogOut, Users } from "lucide-react";
 import { NavItem } from "@/components/layout/NavItem";
 import { Button } from "@/components/ui/Button";
+import { ThemeSelector } from "@/components/ui/ThemeSelector";
 
 const navItems = [
   { href: "/dashboard", icon: BarChart3, label: "Dashboard" },
@@ -27,7 +28,10 @@ export function SidebarContent() {
         <span className="nav-active-indicator" style={{ transform: `translateY(${activeIndex * 52}px)` }} />
         {navItems.map((item) => <NavItem key={item.href} {...item} active={pathname === item.href} />)}
       </nav>
-      <div className="mt-auto rounded-md border border-[var(--border-ghost)] bg-[var(--bg-surface)] p-3">
+      <div className="mt-auto">
+        <ThemeSelector />
+      </div>
+      <div className="rounded-md border border-[var(--border-ghost)] bg-[var(--bg-surface)] p-3">
         <p className="text-xs text-text-muted">Logged in as</p>
         <p className="mb-3 truncate text-sm text-text-primary">{data?.user?.name ?? "Commander"}</p>
         <Button variant="ghost" className="w-full justify-start" onClick={() => signOut({ callbackUrl: "/login" })}>

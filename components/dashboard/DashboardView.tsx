@@ -77,7 +77,7 @@ export function DashboardView() {
             <SearchBar value={filters.search ?? ""} onChange={(search) => patchFilters({ search })} />
             <FilterBar filters={filters} onChange={patchFilters} onClear={() => router.push("/dashboard")} />
           </div>
-          <PaymentTable payments={payments} isLoading={isLoading} filters={filters} onSort={sort} onAdd={openAddPayment} onEdit={setEditing} onReceipt={setReceipt} onDelete={setDeleting} />
+          <PaymentTable payments={payments} members={members} isLoading={isLoading} filters={filters} onSort={sort} onAdd={openAddPayment} onEdit={setEditing} onReceipt={setReceipt} onDelete={setDeleting} />
         </section>
         <ActivityFeed />
       </div>
